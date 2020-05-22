@@ -1,0 +1,8 @@
+Character : Abdoulaye
+	Class : Mage
+	Level : 17
+	Stats:
+		Health : 150
+		Defense : 100
+		Damage : 125
+		Mana : 0
