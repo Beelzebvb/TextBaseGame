@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using TextBaseGame.Entity;
 using TextBaseGame.Entity.Class;
 using TextBaseGame.Manager;
+using TextBaseGame.Utilities;
 
 namespace TextBaseGame.States
 {
@@ -10,29 +12,15 @@ namespace TextBaseGame.States
 
         public CreateCharacterState(Stack<State> states) : base(states)
         {
-            DisplayUI();
-        }
-
-        public override void DisplayUI()
-        {
-            Console.Clear();
-            string UI = "==============================\n" +
-                        "=======Create Character=======\n" +
-                        "==============================\n\n" +
-                        "0 : Menu\n" +
-                        "1 : Name\n" +
-                        "2 : Select Class\n" +
-                        "4 : Save\n";
-
-
-            Console.Write(UI);
-            Console.WriteLine();
+            OnUpdateUI.Invoke();
+            GameManager.Instance.PlayerCharacter = new Character();
         }
 
         public override void Update()
         {
 
-            Console.Write("Choice : ");
+            ConsoleUI.ColorText("Choice : ", ConsoleColor.Green);
+
             string keyInput = Console.ReadLine();
 
             if (GetKeyInput(keyInput, "0"))
@@ -46,40 +34,52 @@ namespace TextBaseGame.States
             else if (GetKeyInput(keyInput, "2"))
             {
                 SetClass();
-
             }
             else if (GetKeyInput(keyInput, "3"))
             {
                 SelectStats();
             }
-            else if (GetKeyInput(keyInput, "4"))
-            {
-                Save();
-            }
             else
             {
-                Console.WriteLine("\n\nPlease select a valid option...\n");
+                ConsoleUI.Error("\nPlease select a valid option...\n");
             }
         }
 
         void SetName()
         {
+        InputName:
             Console.Write("Character Name : ");
             string name = Console.ReadLine();
+            if (name == string.Empty) {
+                OnUpdateUI?.Invoke();
+                ConsoleUI.Error("\nPlease select a valid option...\n");
+                goto InputName; 
+            }
+
             GameManager.Instance.PlayerCharacter.Name = name;
-            DisplayUI();
-            Console.WriteLine("Character name has been set to : " + GameManager.Instance.PlayerCharacter.Name);
+            OnUpdateUI?.Invoke();
+            ConsoleUI.Warning("Character name has been set to : " + GameManager.Instance.PlayerCharacter.Name);
+            Console.WriteLine();
         }
 
         void SetClass()
         {
             Console.Clear();
-            Console.WriteLine("Select Class : ");
+            ConsoleUI.AddHeader("Select Class", ConsoleColor.Yellow);
 
-            Console.WriteLine("1 : Warrior\n" +
-                              "2 : Mage\n" +
-                              "3 : Ranger\n" +
-                              "4 : Thief");
+            string[] classList =
+            {
+                "Warrior",
+                "Mage",
+                "Ranger",
+                "Thief",
+                "Priest",
+                "Archer",
+                "Orc",
+                "Demon"
+            };
+
+            ConsoleUI.AddList(classList, 1, ConsoleColor.Cyan);
 
             CharacterClass characterClass = new Warrior();
 
@@ -87,25 +87,26 @@ namespace TextBaseGame.States
 
             if (GetKeyInput(classInput, "1", "warrior"))
             {
-                characterClass = new Warrior();
+                characterClass = new Warrior(250, 100, 100, 0);
             }
             else if (GetKeyInput(classInput, "2", "mage"))
             {
-                characterClass = new Mage();
+                characterClass = new Mage(200, 75, 75, 100);
             }
             else if (GetKeyInput(classInput, "3", "ranger"))
             {
-                characterClass = new Ranger(); ;
+                characterClass = new Ranger(200, 50, 100, 50); ;
             }
             else if (GetKeyInput(classInput, "4", "thief"))
             {
-                characterClass = new Thief();
+                characterClass = new Thief(150, 50, 125, 75);
             }
 
             GameManager.Instance.PlayerCharacter.CharacterClass = characterClass;
 
-            DisplayUI();
-            Console.WriteLine("You have selected : " + characterClass.GetType().Name);
+            OnUpdateUI?.Invoke();
+            ConsoleUI.Warning("You have selected : " + characterClass.GetType().Name);
+            Console.WriteLine();
         }
 
         void SelectStats()
@@ -116,6 +117,26 @@ namespace TextBaseGame.States
         void Save()
         {
            //TODO override system or create new save
+        }
+
+        public override void DisplayUI()
+        {
+            Console.Clear();
+
+            Console.WriteLine();
+
+            ConsoleUI.AddHeader("Create a Character", ConsoleColor.Yellow);
+            ConsoleUI.DrawLine(30, "_", ConsoleColor.Yellow);
+            Console.WriteLine();
+
+            ConsoleUI.AddOption("Menu",      "0", ConsoleColor.Red);
+            ConsoleUI.AddOption("Set Name",  "1", ConsoleColor.Green);
+            ConsoleUI.AddOption("Set Class", "2", ConsoleColor.Magenta);
+
+            Console.WriteLine();
+            ConsoleUI.DrawLine(30, "_", ConsoleColor.Yellow);
+            Console.WriteLine();
+
         }
 
     }

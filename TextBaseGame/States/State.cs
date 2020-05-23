@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using TextBaseGame.Utilities;
 
 namespace TextBaseGame.States
 {
@@ -9,11 +10,19 @@ namespace TextBaseGame.States
 
         public string Name => GetType().Name;
 
+        public Action OnUpdateUI = delegate { };
+
         public Stack<State> States { get; private set; }
 
-        public State(Stack<State> states) 
+        public State(Stack<State> states)
         {
             States = states;
+            OnUpdateUI += DisplayUI;
+        }
+
+        ~State()
+        {
+            OnUpdateUI -= DisplayUI;
         }
 
         public abstract void Update();
@@ -35,6 +44,24 @@ namespace TextBaseGame.States
             return false;
         }
 
+        public virtual int InputNumber()
+        {
+        InputNumber:
+            Console.Write("Select a number : ");
+            string indexInput = Console.ReadLine();
+
+            if (Int32.TryParse(indexInput, out int saveIndex))
+            {
+                return Math.Abs(saveIndex);
+            }
+            else
+            {
+                ConsoleUI.Error("Please select a valid option...");
+                goto InputNumber;
+            }
+        }
+
+
         public virtual void PushState(State target)
         {
             States.Push(target);
@@ -46,15 +73,15 @@ namespace TextBaseGame.States
 
             States.Pop();
 
-            if(States.Count > 0)
-            States.Peek().DisplayUI();
+            if (States.Count > 0)
+                States.Peek().OnUpdateUI?.Invoke();
         }
 
         public virtual void Loading(int loadCount = 3, int delay = 150)
         {
             int i = 0;
             Console.WriteLine();
-            while(i < loadCount)
+            while (i < loadCount)
             {
                 Thread.Sleep(delay);
                 Console.Write('.');

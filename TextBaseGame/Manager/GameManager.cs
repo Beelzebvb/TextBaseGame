@@ -9,7 +9,7 @@ namespace TextBaseGame.Manager
 
         readonly Stack<State> states;
         bool _isRunning;
-        public Character PlayerCharacter { get; private set; }
+        public Character PlayerCharacter;
 
         public GameManager()
         {

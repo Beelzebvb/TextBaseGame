@@ -16,9 +16,13 @@
             ClassStats.InitStats(250f, 100f, 125f, 0f);
 
         }
+
         public CharacterClass(float health, float defense, float damage, float mana)
         {
+            Name = GetType().Name;
+            ClassStats = new Stats();
             ClassStats.InitStats(health, defense, damage, mana);
         }
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using TextBaseGame.Manager;
+using TextBaseGame.Utilities;
 
 namespace TextBaseGame.States
 {
@@ -9,57 +10,60 @@ namespace TextBaseGame.States
 
         public SelectCharacterState(Stack<State> states) : base(states)
         {
-            DisplayUI();
+            OnUpdateUI?.Invoke();
         }
 
         public override void Update()
         {
-            //MakeChoice:
-            Console.Write("Choice : ");
+        MakeChoice:
+            ConsoleUI.ColorText("Choice : ", ConsoleColor.Green);
             string keyInput = Console.ReadLine();
 
-            if (GetKeyInput(keyInput, "1"))
-            {
-                Console.WriteLine("Character 1 Selected");
-                Console.ReadLine();
-            }
-            else if (GetKeyInput(keyInput, "2"))
-            {
-                Console.WriteLine("Character 2 Selected");
-                Console.ReadLine();
-            }
-            else if (GetKeyInput(keyInput, "3"))
-            {
-                Console.WriteLine("Character 3 Selected");
-                Console.ReadLine();
-            }
-            else if (GetKeyInput(keyInput, "4"))
-            {
-                Console.WriteLine("Character 4 Selected");
-                Console.ReadLine();
-            }
-            else
-            {
-                Console.WriteLine("\n\nPlease select a valid option...\n");
-                //goto MakeChoice;
-            }
+            int[] validIndex = SaveManager.Instance.GetValidIndex();
 
-            PopState();
-
+            if (int.TryParse(keyInput, out int numberInput))
+            {
+                if(numberInput == 0)
+                {
+                    PopState();
+                    return;
+                }
+                foreach (var index in validIndex)
+                {
+                    if (numberInput == index)
+                    {
+                        ConsoleUI.Warning($"Character {numberInput} Selected");
+                        SaveManager.Instance.Load(GameManager.Instance.PlayerCharacter, numberInput);
+                        Console.ReadLine();
+                        PopState();
+                        return;
+                    }
+                }
+            }
+            ConsoleUI.Error("Please select a valid option...");
+            goto MakeChoice;
         }
         public override void DisplayUI()
         {
             Console.Clear();
 
-            string UI = "==============================\n" +
-                        "======SELECT A CHARACTER======\n" +
-                        "==============================\n\n" +
-                        "1 : Character 1\n" +
-                        "2 : Character 2\n" +
-                        "3 : Character 3\n" +
-                        "4 : Character 4\n\n";
+            Console.WriteLine();
 
-            Console.Write(UI);
+            ConsoleUI.AddHeader("Select a Character", ConsoleColor.Yellow);
+            ConsoleUI.DrawLine(30, "_", ConsoleColor.Yellow);
+
+            Console.WriteLine();
+
+            ConsoleUI.AddOption("Menu", "0", ConsoleColor.Red);
+
+            for (int i = 0; i < SaveManager.Instance.GetSaveNames().Length; i++)
+            {
+                string name = SaveManager.Instance.GetSaveNames()[i];
+                ConsoleUI.AddOption($"{name}", $"{SaveManager.Instance.GetSaveIndexOf(name)}", ConsoleColor.Cyan);
+            }
+            Console.WriteLine();
+            ConsoleUI.DrawLine(30, "_", ConsoleColor.Yellow);
+            Console.WriteLine();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace TextBaseGame.Entity
     class Character
     {
 
-        public string Name;
+        public string Name = "Default Character";
         public float Index = 0;
 
         public CharacterClass CharacterClass { get; set; }
@@ -20,7 +20,7 @@ namespace TextBaseGame.Entity
         public void DisplayInfo()
         {
             string info = 
-                          $"\ncharacter : {Index}" + "{\n"
+                          $"\ncharacter : {Index}" + "\n"
                         + $"     name  : {Name}\n"
                         + $"     class : {CharacterClass.Name}\n"
                         + $"     level : {CharacterClass.ClassStats.Level}\n"
@@ -29,7 +29,7 @@ namespace TextBaseGame.Entity
                         + $"             defense : {CharacterClass.ClassStats.Defense}\n"
                         + $"             damage  : {CharacterClass.ClassStats.Damage}\n"
                         + $"             mana    : {CharacterClass.ClassStats.Mana}\n"
-                        +  "}\n\n";
+                        +  "\n\n";
 
             Console.WriteLine(info);
         }
